@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+}
+
+/* LAYOUT */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* TOPBAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.logout {
+    background: red;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+}
+
+/* TITLE */
+#title {
+    color: #ff9800;
+}
+
+/* INPUT */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+select option {
+    background: #1c1c1c;
+    color: white;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+    background: #ff9800;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* SERVICES */
+.services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.services label {
+    background: rgba(255,255,255,0.1);
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+th {
+    color: #ff9800;
+}
+
+/* DELETE BTN */
+.delete-btn {
+    background: red;
+    border: none;
+    padding: 5px 8px;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* EARNINGS */
+.earnings {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.earn-box {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 4px solid #ff9800;
+}
+
+/* TOTAL */
+.total {
+    background: rgba(255,152,0,0.15);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .container { flex-direction: column; }
+    .sidebar { width: 100%; text-align: center; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="sidebar">
+    <h2>💈 Barber</h2>
+</div>
+
+<div class="main">
+
+<div class="topbar">
+    <h2 id="title"></h2>
+    <div class="logout" onclick="logout()">Logout</div>
+</div>
+
+<div class="total" id="totalBox">
+    Total Earnings: Rs 0
+</div>
+
+<div class="card">
+    <h3>Add Customer</h3>
+
+    <input id="name" placeholder="Customer Name">
+
+    <select id="employee">
+        <option>Employee 1</option>
+        <option>Employee 2</option>
+        <option>Employee 3</option>
+    </select>
+
+    <div class="services">
+        <label><input type="checkbox" value="Haircut"> Haircut</label>
+        <label><input type="checkbox" value="Beard"> Beard</label>
+        <label><input type="checkbox" value="Facial"> Facial</label>
+        <label><input type="checkbox" value="Massage"> Massage</label>
+        <label><input type="checkbox" value="Polish"> Polish</label>
+        <label><input type="checkbox" value="Hair Coloring"> Hair Coloring</label>
+        <label><input type="checkbox" value="Skin Treatment"> Skin Treatment</label>
+    </div>
+
+    <input id="price" placeholder="Enter Price">
+    <input type="date" id="date">
+
+    <button onclick="add()">Add</button>
+</div>
+
+<div class="card">
+    <h3>Employee Earnings 💰</h3>
+    <div class="earnings" id="earnings"></div>
+</div>
+
+<div class="card">
+    <h3>Customer Records 📋</h3>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Employee</th>
+                    <th>Services</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="data"></tbody>
+        </table>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+const shopName = localStorage.getItem("shopName");
+
+if (!shopName) {
+    window.location.href = "login.html";
+}
+
+document.getElementById("title").innerText = shopName;
+
+// logout
+function logout() {
+    localStorage.removeItem("shopName");
+    window.location.href = "login.html";
+}
+
+async function add() {
+    const checkboxes = document.querySelectorAll('.services input:checked');
+    let services = [];
+
+    checkboxes.forEach(cb => services.push(cb.value));
+
+    const body = {
+        name: document.getElementById("name").value,
+        employee: document.getElementById("employee").value,
+        service: services,
+        price: Number(document.getElementById("price").value),
+        date: document.getElementById("date").value,
+        shopName: shopName
+    };
+
+    await fetch("http://localhost:3000/add-customer", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+    });
+
+    document.getElementById("name").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("date").value = "";
+    document.querySelectorAll('.services input').forEach(cb => cb.checked = false);
+
+    load();
+}
+
+async function del(index) {
+    await fetch(`http://localhost:3000/delete/${shopName}/${index}`, {
+        method: "DELETE"
+    });
+
+    load();
+}
+
+async function load() {
+    const res = await fetch(`http://localhost:3000/data/${shopName}`);
+    const data = await res.json();
+
+    let html = "";
+    let earnings = {};
+    let total = 0;
+
+    data.forEach((c, index) => {
+
+        html += `
+        <tr>
+            <td>${c.name}</td>
+            <td>${c.employee}</td>
+            <td>${Array.isArray(c.service) ? c.service.join(", ") : c.service}</td>
+            <td>Rs ${c.price}</td>
+            <td>${c.date}</td>
+            <td><button class="delete-btn" onclick="del(${index})">Delete</button></td>
+        </tr>`;
+
+        if (!earnings[c.employee]) earnings[c.employee] = 0;
+        earnings[c.employee] += Number(c.price);
+
+        total += Number(c.price);
+    });
+
+    document.getElementById("data").innerHTML = html || "<tr><td colspan='6'>No records</td></tr>";
+    document.getElementById("totalBox").innerText = "Total Earnings: Rs " + total;
+
+    let earnHTML = "";
+    for (let emp in earnings) {
+        earnHTML += `
+        <div class="earn-box">
+            <b>${emp}</b><br>
+            Rs ${earnings[emp]}
+        </div>`;
+    }
+
+    document.getElementById("earnings").innerHTML = earnHTML;
+}
+
+load();
+</script>
+
+</body>
+</html>
