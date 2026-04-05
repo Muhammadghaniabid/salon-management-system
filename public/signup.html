@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #141414, #2b2b2b);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+    padding: 20px; /* ✅ FIX: prevents edge sticking */
+}
+
+/* CONTAINER */
+.container {
+    width: 100%;
+    max-width: 420px; /* ✅ FIX: more space for fields */
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.08);
+    padding: 25px;
+    border-radius: 14px;
+    text-align: center;
+
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* TITLE */
+h2 {
+    color: #ff9800;
+    margin-bottom: 15px;
+}
+
+/* INPUT */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+
+    background: #ff9800;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* LINK */
+a {
+    display: block;
+    margin-top: 15px;
+    color: #ff9800;
+    text-decoration: none;
+}
+
+/* 📱 MOBILE FIX */
+@media (max-width: 400px) {
+    .card {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>Register Shop 🏪</h2>
+
+        <input id="owner" placeholder="Owner Name">
+        <input id="shop" placeholder="Shop Name">
+        <input id="phone" placeholder="Phone Number">
+        <input id="location" placeholder="Location">
+        <input id="code" placeholder="Secret Code 🔐">
+        <input id="pass" type="password" placeholder="Password">
+
+        <button onclick="signup()">Register</button>
+
+        <a href="login.html">Already have account? Login</a>
+    </div>
+</div>
+
+<script>
+async function signup() {
+    const owner = document.getElementById("owner").value;
+    const shopName = document.getElementById("shop").value;
+    const phone = document.getElementById("phone").value;
+    const location = document.getElementById("location").value;
+    const code = document.getElementById("code").value;
+    const password = document.getElementById("pass").value;
+
+    const res = await fetch("http://localhost:3000/signup", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ owner, shopName, phone, location, password, code })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        alert("Registered!");
+        window.location.href = "login.html";
+    } else {
+        alert(data.message);
+    }
+}
+</script>
+
+</body>
+</html>
